@@ -55,5 +55,5 @@ adb shell /data/local/tmp/frida-server-16.2.1-android-x86 &
 
 
 ```
-frida -U -f com.jainam.space -l rootbypass.js
+frida -U -f (Target) -l rootbypass.js
 ```
