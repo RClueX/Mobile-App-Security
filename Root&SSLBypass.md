@@ -40,7 +40,11 @@ Check Package name - > frida-ps -Ua
 
 [ For checking system configuration i.e : x86 or 64 bit ]
 
->adb shell getprop ro.product.cpu.abi        
+>adb shell getprop ro.product.cpu.abi
+
+Download Frida server 
+
+> https://github.com/frida/frida/releases   
 
 ```
 adb push frida-server-16.2.1-android-x86 /data/local/tmp
