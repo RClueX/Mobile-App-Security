@@ -48,7 +48,10 @@ adb shell chmod 777 /data/local/tmp/frida-server-16.2.1-android-x86
 ```
 adb push rootbypass.js /data/local/tmp         (Optional Step)
 ```
+`For ssl Pinning Bypass -`
+> adb push burp.crt /data/local/tmp
 
+> adb push sslbypassscript.js /data/local/tmp 
 ```
 adb shell /data/local/tmp/frida-server-16.2.1-android-x86 &
 ```
