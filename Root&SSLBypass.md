@@ -46,7 +46,7 @@ adb shell chmod 777 /data/local/tmp/frida-server-16.2.1-android-x86
 ```
 
 ```
-adb push rootbypass.js /data/local/tmp
+adb push rootbypass.js /data/local/tmp         (Optional Step)
 ```
 
 ```
