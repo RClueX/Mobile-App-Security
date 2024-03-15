@@ -39,7 +39,7 @@ Check Package name - > frida-ps -Ua
 ```
 
 
->adb shell getprop ro.product.cpu.abi   For checking system configuration i.e : 86X or 64 bit
+>adb shell getprop ro.product.cpu.abi        [For checking system configuration i.e : 86X or 64 bit]
 
 ```
 adb push frida-server-16.2.1-android-x86 /data/local/tmp
