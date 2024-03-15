@@ -2,6 +2,7 @@
 
 **Drozer Shortcut**
 ---
+
 `
 adb connect IP
 `
@@ -30,9 +31,9 @@ Cat backup.ab zlib-flate -uncompress > backup_compressed.tar
 **Root Detection & SSL Pinning Bypass**
 ---
 
-`
+```
 adb connect IP
-`
+```
 
 ```
 Check Package name - > frida-ps -Ua
@@ -67,5 +68,5 @@ adb shell /data/local/tmp/frida-server-16.2.1-android-x86 &
 
 
 ```
-frida -U -f (Target Package Name) -l rootbypass.js or sslbypassscript.js
+frida -U -f (Target Application) -l rootbypass.js or sslbypassscript.js
 ```
