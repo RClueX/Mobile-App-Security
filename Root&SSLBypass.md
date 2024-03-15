@@ -38,7 +38,7 @@ adb connect IP
 Check Package name - > frida-ps -Ua
 ```
 
-[For checking system configuration i.e : x86 or 64 bit]
+[ For checking system configuration i.e : x86 or 64 bit ]
 
 >adb shell getprop ro.product.cpu.abi        
 
