@@ -1,0 +1,244 @@
+# Android Penetration Testing
+
+## Finding 1: Database Stored in Android Device Without Encryption
+  - Install and use the app, executing all functions at least once. Data can be generated when entered by the user, sent by the endpoint, or shipped with the app.
+  - Check both internal and external local storage for any files created by the application that contain sensitive data. (username, email_id, client_id, password, mobile_number, bank_account_number, etc.)
+  - Determine whether SQLite databases (Only for .db extension files) are available and whether they contain sensitive information. SQLite databases are stored in `/data/data/<package-name>/databases`.
+  - For POC of the file that contains sensitive data and note the path of that file as we have to mention this file name and path in our report.
+
+## Finding 2: Insecure Data Storage
+  - Install and use the app, executing all functions at least once. Data can be generated when entered by the user, sent by the endpoint, or shipped with the app.
+  - Check Shared Preferences that are stored as XML files (in `/data/data/<package-name>/shared_prefs`) for sensitive information. Shared Preferences are insecure and unencrypted by default. Some apps might opt to use secure-preferences to encrypt the values stored in Shared Preferences. If sensitive data found, then we give finding.
+  - For POC of the file that contains sensitive data and note the path of that file as we have to mention this file name and path in our report.
+
+Tip: Make a zip of `/data/data/com.pakage.name/` and transfer and unzip into PC and open files into Visual Studio Code, search keywords into folder. (Device must be rooted)
+
+## Finding 3: Root Detection Not Implemented
+  - Open root browser and go to `"data/data/com.application.name/"` and take POC of this screen, after that open the application folder and take another POC here (showing all folders of the application).
+  - Here are the steps on how to prevent an app from running in a rooted Android device:
+1.  Check for the presence of root-only files or directories. This is one of the most common methods for root detection. You can check for the presence of files or directories that are only accessible to root users. For example, you can check for the existence of the /su directory or the su binary.
+2.  Check for the presence of root-only permissions. You can also check for the presence of permissions that are only granted to root users. For example, you can check for the SU permission or the MOUNT_UNMOUNT_FILESYSTEMS permission.
+3.  Check for the presence of root-only system binaries. You can also check for the presence of system binaries that are only available to root users. For example, you can check for the existence of the su binary or the busybox binary. 
+    ```
+    The following list of Su binaries are often looked for on rooted devices.
+
+    /cache
+    /data
+    /data/local/
+    /data/local/bin/
+    /data/local/xbin/
+    /dev
+    /sbin/
+    /sbin/su
+    /su/bin/
+    /system/app/Superuser.apk
+    /system/bin/
+    /system/bin/su
+    /system/bin/.ext/
+    /system/bin/.ext/.su
+    /system/bin/failsafe/
+    /system/sd/xbin/
+    /system/su
+    /system/usr/we-need-root/
+    /system/usr/we-need-root/su-backup
+    /system/xbin/
+    /system/xbin/mu
+    /system/xbin/su
+    ```
+5.  Use the Google SafetyNet Attestation API. The Google SafetyNet Attestation API is a more reliable way to detect root devices. This API checks the device's integrity and returns a response that indicates whether the device is rooted or not.
+
+ - Once you have determined that the device is rooted, you can take appropriate action. For example, you can refuse to run the app, or you can display a warning message.
+ - Here is an example of how to implement root detection in an Android APK: (This code will check for the presence of root-only files, directories, permissions, and system binaries. If any of these are found, the method will return true, indicating that the device is rooted. Otherwise, the method will return false.)
+      ```
+      import android.content.Context;
+      import android.os.Build;
+      
+      public class RootDetector {
+          public static boolean isRooted(Context context) {
+              // Check for the presence of root-only files or directories.
+              if (new File("/su").exists()) {
+                  return true;
+              }
+              // Check for the presence of root-only permissions.
+              if (context.getPackageManager().checkPermission("SU", "android") == PackageManager.PERMISSION_GRANTED) {
+                  return true;
+              }
+              // Check for the presence of root-only system binaries.
+              if (new File("/system/bin/su").exists()) {
+                  return true;
+              }
+              // Use the Google SafetyNet Attestation API.
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                  String safetyNetResponse = SafetyNet.getAttestationResponse(context);
+                  if (safetyNetResponse != null) {
+                      return false;
+                  }
+              }
+      
+              return false;
+          }
+      }
+      ```
+
+
+## Finding 4: Application Debuggable is Enabled
+  - Get target application apk into kali linux, and decompile using [Apktool](https://github.com/iBotPeaches/Apktool). Run the following command:
+    ```
+    apktool d sample.apk
+    ```
+  - Go to the extracted folder and open `AndroidManifest.xml` and Find this flag: [`android:debuggable="true"`](https://developer.android.com/topic/security/risks/android-debuggable)
+  - It must be false, If the value is set to `true` then it’s Finding.
+
+## Finding 5: Application Data Backup is Enabled
+  - Decompile and open the [`AndroidManifest.xml`](https://developer.android.com/guide/topics/manifest/manifest-intro) file and Find this flag: [`android:allowBackup="true"`](https://developer.android.com/guide/topics/data/autobackup)
+  - It must be false, If the value is set to `true` then it could be a Finding.
+  - After executing all available app functions, attempt to back up via adb. If the backup is successful, inspect the backup archive for sensitive data. Open a terminal and run the following command:
+  ```
+  adb backup -apk -nosystem <package-name>
+                  or
+  adb backup "-apk -nosystem <package-name>"
+  ```
+  - ADB should respond now with "Now unlock your device and confirm the backup operation" and you should be asked on the Android phone for a password. Enter random one, For example here is: 123
+  - Approve the backup from your device by selecting the Back up my data option. After the backup process is finished, the file .ab (ex: backup.ab) will be in your working directory. 
+  - To convert the .ab file to tar. Download the [Android Backup Extractor](https://github.com/nelenkov/android-backup-extractor/releases) is another alternative backup tool. Run the following command to convert the tar file: _(If tool dosen't work, you have to download the Oracle JCE Unlimited Strength Jurisdiction Policy Files for JRE7 or JRE8 and place them in the JRE lib/security folder.)_
+  `java -jar abe.jar abe unpack <backup.ab> <backup.tar> [password]`
+  - `[password]` is the password when your android device asked you earlier. For example here is: 123
+  ```
+  java -jar abe.jar unpack backup.ab backup.tar 123
+  ```
+  - if it shows something like this, which means it has unpacked successfully.
+  ```
+ Picked up _JAVA_OPTIONS: -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true
+Calculated MK checksum (use UTF-8: true): 916423B1691313FF3696A8DDC185E4AB9F557304B8DC70A3B0008D189C0E5161
+0% 1% 2% 4% 5% 7% 9% 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 99% 100% 
+2769408 bytes written to backup.tar.
+  ```
+  - Extract the tar file to your working directory.
+  ```
+  tar -xvf backup.tar
+  ```
+  - Check into extracted folder for any files created by the application that contain sensitive data. If found then it's a Finding.
+
+## Finding 6: Application UsesClearTextTraffic Enabled
+  - Decompile and open the [`AndroidManifest.xml`](https://developer.android.com/guide/topics/manifest/manifest-intro) file and Find this flag: [`android:usesCleartextTraffic="true"`](https://developer.android.com/guide/topics/manifest/application-element#usesCleartextTraffic)
+  - It must be false, If the value is set to `true` then it’s Finding.
+  
+## Finding 7: Application Exported is Enabled
+  - Decompile and open the [`AndroidManifest.xml`](https://developer.android.com/guide/topics/manifest/manifest-intro) file and Find this flag: [`android:exported="true"`](https://developer.android.com/topic/security/risks/android-exported)
+  - It must be false, If the value is set to `true` then it could be Finding then you need to use drozer to call that specific activity and check if it opens by drozer or not.
+  - To check Use `Drozer` run this commands. (Drozer Agent app must be installed and ON in the device)
+```
+Starting a session:
+$ adb forward tcp:31415 tcp:31415
+$ drozer console connect                    : If device connected with USB
+$ drozer console connect --server <IP>      : If device cnnected with Wifi_ADB
+
+Retrieving package information:
+dz> run app.package.list -f <app name>
+dz> run app.package.info -a <package name>
+
+Identifying the attack surface:
+dz> run app.package.attacksurface <package name>
+
+Exploiting Activities:
+dz> run app.activity.info -a <package name> -u
+dz> run app.activity.start --component <package name> <component name>
+dz> run app.activity.start --component <package name> <component name> --extra <type> <key> <value>
+
+Exploiting Content Provider (OPTIONAL):
+dz> run app.provider.info -a <package name>
+dz> run scanner.provider.finduris -a <package name>
+dz> run app.provider.query <uri>
+dz> run app.provider.update <uri> --selection <conditions> <selection arg> <column> <data>
+dz> run scanner.provider.sqltables -a <package name>
+dz> run scanner.provider.injection -a <package name>
+dz> run scanner.provider.traversal -a <package name>
+
+Exploiting Broadcast Receivers (OPTIONAL):
+dz> run app.broadcast.info -a <package name>
+dz> run app.broadcast.send --component <package name> <component name> --extra <type> <key> <value>
+dz> run app.broadcast.sniff --action <action>
+
+Exploiting Service (OPTIONAL):
+dz> run app.service.info -a <package name>
+dz> run app.service.start --action <action> --component <package name> <component name>
+dz> run app.service.send <package name> <component name> --msg <what> <arg1> <arg2> --extra <type> <key> <value> --bundle-as-obj
+
+```
+9. If drozer can open any activity that contains any sensitive user data then the exported
+activity is vulnerable means it’s Finding 7.
+  
+## Finding 8: Insecure Logging and Unintended Data Storage
+  - Use all the mobile app functions at least once, then identify the application's data directory and look for log files (`/data/data/<package-name>`). Check the application logs to determine whether log data has been generated; some mobile applications create and store their own logs in the data directory.
+  - Many application developers still use `System.out.println` or `printStackTrace` instead of a proper logging class. Therefore, your testing strategy must include all output generated while the application is starting, running and closing. To determine what data is directly printed by `System.out.println` or `printStackTrace`, you can use [Logcat](https://developer.android.com/tools/logcat).
+  - Connect the adb terminal with device/emulator using wifi adb or with USB.
+  - Clear the app's storage and cache before running logcat.
+  - Now, run the cmd `adb logcat` or `adb logcat > logs.save` to save captured logs, but it won't show you and result on terminal if you run 2nd cmd.
+  - Remember that you can target a specific app by filtering the Logcat output as follows:
+  ```
+  adb logcat | grep "$(adb shell ps | grep <package-name> | awk '{print $2}')"
+  ```
+  - Now, Open the targeted app and use every functionality such as loging with different methods, creating profiles, editing profiles, entering sensitive details, etc.
+  - Now stop the logcat by pressing ctrl+z. And search the logs for any sensitive data. If any sensitive data is found in the logs, then it's Finding.
+
+## Finding 9: Successful Reverse Engineering
+
+  - Get the apk in your normal Windows/Linux Computer and upload the apk on this online decompilers to decompile the apk by visiting this link or this link.
+  - Now download this decompiled apk, zip folder and unzip it.
+  - Search for classes.dex file, and open it using the Jadx GUI Application. To download the Jadx GUI go to this link.
+  - In the Jadx GUI, open every folder and search for MainActivity.class file and check the java or kotlin code.
+  - If you haven’t found the MainActivity.class file, then open any activity which seems important for the application and check its code.
+
+
+
+
+-------------------
+-------------------
+
+
+List of Vulnerabilities
+
+    Root Detection
+    Emulator Detection
+    Insecure Data Storage – Shared Prefs - 1
+    Insecure Data Storage - Shared Prefs - 2
+    Insecure Data Storage - SQLite
+    Insecure Data Storage – Temp Files
+    Insecure Data Storage – SD Card
+    Keyboard Cache
+    Insecure Logging
+    Input Validations – XSS
+    Input Validations – SQLi
+    Input Validations – WebView
+    Unprotected Android Components – Activity
+    Unprotected Android Components –Service
+    Unprotected Android Components – Broadcast Receivers
+    Unprotected Android Components – Content Providers (Coming Soon)
+    Hard coding issues
+    Network intercepting – HTTP
+    Network intercepting – HTTPS
+    Network intercepting – Certificate Pinning
+    Misconfigured Network_Security_Config.xml
+    Android Debuggable
+    Android allowBackup
+    Custom URL Scheme
+    Broken Cryptography
+    QR Code Scanning (Coming Soon)
+    Fingerprint Authentication (Coming Soon)
+
+
+
+Refrance:
+  https://mas.owasp.org/MASTG/Tools/0x08a-Testing-Tools/
+  
+  https://lunarmonk.wordpress.com/tag/android/
+  
+  https://www.axcelsec.com/2018/01/mobile-penetration-testing-android.html
+  
+  https://www.linkedin.com/pulse/hacking-android-apps-through-exposed-components-tal-melamed
+  
+  https://oscp.medium.com/complete-android-pentesting-guide-203ed34035e3
+  
+  http://securityhorror.blogspot.com/p/android-pentest-guide.html
+
+androgoat owasp vulnerability assessment
