@@ -10,7 +10,7 @@ adb connect IP
 `
 
 `
-adb shell am start -n com.absli/.ui.view.base.SplashActivity
+adb shell am start -n com.package.abc/.ui.view.base.SplashActivity
 `
 
 `
