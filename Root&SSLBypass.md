@@ -100,3 +100,31 @@ Check Package name - > frida-ps -Ua
 ```
 frida -U -f (Target Application) -l rootbypass.js or sslbypassscript.js
 ```
+
+
+-------------------------------------------------------
+
+**Bypass SSL Pinning for flutter Apps**
+---
+
+```
+pip3 install reflutter
+```
+> Enter your Burp Suite IP: <input_ip>
+
+```
+reflutter name-apps.apk
+```
+
+> Now we will get release.RE.apk but this apk is not sign yet. We have to sign manually - **(uber-apk-signer-1.2.1.jar)**
+
+```
+java -jar uber-apk-signer-1.2.1.jar --apk release.RE.apk
+```
+
+> Configure the proxy in burpsuite.
+
+> First, change port 8083 because reFlutter set it by default.
+
+> In Request handling tab, enable Support invisible proxying and click on OK. 
+
