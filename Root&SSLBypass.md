@@ -110,13 +110,14 @@ frida -U -f (Target Application) -l rootbypass.js or sslbypassscript.js
 ```
 pip3 install reflutter
 ```
-> Enter your Burp Suite IP: <input_ip>
 
 ```
 reflutter name-apps.apk
 ```
+> Enter your Burp Suite IP: <input_ip>
 
-> Now we will get release.RE.apk but this apk is not sign yet. We have to sign manually - **(uber-apk-signer-1.2.1.jar)**
+> Now we will get release.RE.apk but this apk is not sign yet. We have to sign manually -
+[uber-apk-signer](https://github.com/RClueX/Mobile-App-Security-Testing/files/14861848/uber-apk-signer-1.3.0.1.2.zip)
 
 ```
 java -jar uber-apk-signer-1.2.1.jar --apk release.RE.apk
