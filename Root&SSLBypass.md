@@ -127,5 +127,8 @@ java -jar uber-apk-signer-1.2.1.jar --apk release.RE.apk
 
 > First, change port 8083 because reFlutter set it by default.
 
-> In Request handling tab, enable Support invisible proxying and click on OK. 
+> In Request handling tab, enable Support invisible proxying and click on OK.
 
+```
+adb install release.RE-aligned-debugSigned.apk
+```
