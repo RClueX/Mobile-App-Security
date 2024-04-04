@@ -5,25 +5,25 @@
 **Drozer Shortcut**
 ---
 
-`
+```
 adb connect IP
-`
+```
 
-`
+```
 adb shell am start -n com.package.abc/.ui.view.base.SplashActivity
-`
+```
 
-`
+```
 am broadcast -a theBroadcast -n com.android.insecurebankv2/com.android.insecurebankv2.MyBroadCastReceiver –es phonenumber 5554 –es newpass Dinesh@123!
-`
+```
 
-`
+```
  Adb backup –apk –shared (apk name)
- `
+ ```
 
- `
+ ```
 Cat backup.ab zlib-flate -uncompress > backup_compressed.tar
-`
+```
 
 
 ---
