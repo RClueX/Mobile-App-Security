@@ -14,3 +14,28 @@ sudo ./openvpn-install.sh
 ```
 
 Enter below details after running the script
+
+Which IPv4 address should be used?
+
+    Use your PC IP.
+
+Public IPv4 address / hostname []:
+
+    Use your PC IP.
+
+Protocol
+
+    1
+
+Port
+
+    1194
+
+DNS Server
+
+    1
+
+Name [client]:
+
+    name_any (Example: newvpn)
+
