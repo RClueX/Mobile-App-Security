@@ -14,7 +14,7 @@
 
 `StaticTesting`[here](https://github.com/RClueX/Mobile-App-Security-Testing/blob/main/StaticTesting.md)
 
-
+`IOS-SSL-Bypass`[here]iOS-SSL Pinning on Flutter.md
 
 ---
 ![110445358](https://github.com/RClueX/Mobile-App-Security-Testing/assets/110445358/0917f57b-7cc4-473d-a698-7d68a1828956)
