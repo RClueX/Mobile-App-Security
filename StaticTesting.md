@@ -94,3 +94,11 @@ dz> run app.service.info -a <package name>
 dz> run app.service.start --action <action> --component <package name> <component name>
 dz> run app.service.send <package name> <component name> --msg <what> <arg1> <arg2> --extra <type> <key> <value> --bundle-as-obj
 
+
+
+
+Side channel attack
+Tapjacking
+Android biomentric bypass
+IOS biomatric bypass
+
