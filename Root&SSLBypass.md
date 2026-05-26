@@ -98,6 +98,10 @@ adb push sslbypassscript.js /data/local/tmp
 ```
 ```
 adb shell /data/local/tmp/frida-server-16.2.1-android-x86 &
+or
+
+adb shell "su -c '/data/local/tmp/frida-server-17.9.11-android-arm &'"
+
 ```
 
 ```
